@@ -1,134 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Google Sheets Data Fetch</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background-color: #f5f5f5;
-        }
-        header {
-            background-color: #4CAF50;
-            color: white;
-            padding: 1rem;
-            width: 100%;
-            text-align: center;
-        }
-        .filter-container {
-            margin: 20px 0;
-        }
-        .data-table {
-            border-collapse: collapse;
-            width: 80%;
-            margin: 20px 0;
-            background-color: white;
-        }
-        .data-table th, .data-table td {
-            border: 1px solid #ddd;
-            padding: 8px;
-        }
-        .data-table th {
-            background-color: #f2f2f2;
-            text-align: left;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Table</title>
 </head>
 <body>
-    <header>
-        <h1>Google Sheets Data Viewer</h1>
-    </header>
-    <div class="filter-container">
-        <label for="filter">Filter by keyword:</label>
-        <input type="text" id="filter" oninput="applyFilter()" placeholder="Enter keyword">
-    </div>
-    <table class="data-table" id="data-table">
-        <thead>
-            <tr id="table-header">
-                <!-- Table headers will be inserted dynamically -->
-            </tr>
-        </thead>
-        <tbody id="table-body">
-            <!-- Table data will be inserted dynamically -->
-        </tbody>
-    </table>
-
-    <script>
-        // Replace with your Google Sheets API URL (published as a web app or JSON feed)
-        const SHEET_URL = "https://spreadsheets.google.com/feeds/cells/1-P9fAKkmqFPuKxamR2nf-FpsMkd63SFcvIouIJWuuyU/1/public/full?alt=json";
-
-        // Fetch data from the Google Sheet
-        async function fetchSheetData() {
-            try {
-                const response = await fetch(SHEET_URL);
-                const data = await response.json();
-                const entries = data.feed.entry;
-
-                // Extract rows and columns
-                const rows = [];
-                let maxCol = 0;
-                entries.forEach(entry => {
-                    const row = parseInt(entry.gs$cell.row, 10);
-                    const col = parseInt(entry.gs$cell.col, 10);
-                    maxCol = Math.max(maxCol, col);
-                    rows[row] = rows[row] || [];
-                    rows[row][col - 1] = entry.gs$cell.$t;
-                });
-
-                renderTable(rows);
-            } catch (error) {
-                console.error("Error fetching sheet data:", error);
-            }
-        }
-
-        // Render the table
-        function renderTable(rows) {
-            const headerRow = rows[0];
-            const tableHeader = document.getElementById("table-header");
-            const tableBody = document.getElementById("table-body");
-
-            tableHeader.innerHTML = "";
-            tableBody.innerHTML = "";
-
-            // Populate headers
-            headerRow.forEach(header => {
-                const th = document.createElement("th");
-                th.textContent = header;
-                tableHeader.appendChild(th);
-            });
-
-            // Populate rows
-            rows.slice(1).forEach(row => {
-                const tr = document.createElement("tr");
-                row.forEach(cell => {
-                    const td = document.createElement("td");
-                    td.textContent = cell || "";
-                    tr.appendChild(td);
-                });
-                tableBody.appendChild(tr);
-            });
-        }
-
-        // Apply filter to table
-        function applyFilter() {
-            const keyword = document.getElementById("filter").value.toLowerCase();
-            const rows = document.querySelectorAll("#table-body tr");
-
-            rows.forEach(row => {
-                const cells = row.querySelectorAll("td");
-                const match = Array.from(cells).some(cell => cell.textContent.toLowerCase().includes(keyword));
-                row.style.display = match ? "" : "none";
-            });
-        }
-
-        // Initialize
-        fetchSheetData();
-    </script>
+  <input type="text" id="dateFilter" placeholder="Filter by Date">
+  <input type="text" id="amountFilter" placeholder="Filter by Amount">
+  <input type="text" id="descriptionFilter" placeholder="Filter by Description">
+  <button onclick="filterData()">Filter</button>
+  <table id="dataTable">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Amount</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody">
+      <!-- Data will be inserted here -->
+    </tbody>
+  </table>
+  <script src="script.js"></script>
+  <script>
+    async function fetchData() {
+      // Fetch data logic here
+    }
+    function filterData() {
+      const dateFilter = document.getElementById('dateFilter').value;
+      const amountFilter = document.getElementById('amountFilter').value;
+      const descriptionFilter = document.getElementById('descriptionFilter').value;
+      const tableBody = document.getElementById('tableBody');
+      tableBody.innerHTML = ''; // Clear table body
+      fetchData().then(data => {
+        data.forEach(row => {
+          if (row.date.includes(dateFilter) && row.amount.includes(amountFilter) && row.description.includes(descriptionFilter)) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td>${row.date}</td><td>${row.amount}</td><td>${row.description}</td>`;
+            tableBody.appendChild(tr);
+          }
+        });
+      });
+    }
+  </script>
 </body>
 </html>
