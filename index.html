@@ -24,7 +24,7 @@
     </tbody>
   </table>
   <script>
-    function fetchData() {
+    async function fetchData() {
       Tabletop.init({
         key: '1Jc9TsdJwvmCdaRSIeasMOtDD_OLBs2keyMgUcsm7F8g',
         callback: showInfo,
@@ -47,14 +47,18 @@
       const descriptionFilter = document.getElementById('descriptionFilter').value;
       const tableBody = document.getElementById('tableBody');
       tableBody.innerHTML = ''; // Clear table body
-      fetchData().then(data => {
-        data.forEach(row => {
-          if (row.date.includes(dateFilter) && row.amount.includes(amountFilter) && row.description.includes(descriptionFilter)) {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `<td>${row.date}</td><td>${row.amount}</td><td>${row.description}</td>`;
-            tableBody.appendChild(tr);
-          }
-        });
+      Tabletop.init({
+        key: 'YOUR_SPREADSHEET_ID',
+        callback: data => {
+          data.forEach(row => {
+            if (row.date.includes(dateFilter) && row.amount.includes(amountFilter) && row.description.includes(descriptionFilter)) {
+              const tr = document.createElement('tr');
+              tr.innerHTML = `<td>${row.date}</td><td>${row.amount}</td><td>${row.description}</td>`;
+              tableBody.appendChild(tr);
+            }
+          });
+        },
+        simpleSheet: true
       });
     }
 
