@@ -1,7 +1,7 @@
 const gsheetdb = require('gsheetdb');
 const db = new gsheetdb({
   spreadsheetId: '1Jc9TsdJwvmCdaRSIeasMOtDD_OLBs2keyMgUcsm7F8g',
-  sheetName: 'test',
+  sheetName: 'tests',
   credentialsJSON: require('"C:\Users\abubumusyik\Desktop\masterlist-444513-6e21f708b0a6.json"')
 });
 
