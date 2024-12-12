@@ -7,17 +7,11 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Tabletop.js/1.5.1/tabletop.min.js"></script>
 </head>
 <body>
-  <input type="text" id="dateFilter" placeholder="Filter by Date">
-  <input type="text" id="amountFilter" placeholder="Filter by Amount">
   <input type="text" id="descriptionFilter" placeholder="Filter by Description">
   <button onclick="filterData()">Filter</button>
   <table id="dataTable">
     <thead>
       <tr>
-        <th>Date</th>
-        <th>Amount</th>
-        <th>Description</th>
-      </tr>
     </thead>
     <tbody id="tableBody">
       <!-- Data will be inserted here -->
@@ -26,7 +20,7 @@
   <script>
     async function fetchData() {
       Tabletop.init({
-        key: 1Jc9TsdJwvmCdaRSIeasMOtDD_OLBs2keyMgUcsm7F8g,
+        key: '1Jc9TsdJwvmCdaRSIeasMOtDD_OLBs2keyMgUcsm7F8g',
         callback: showInfo,
         simpleSheet: true
       });
@@ -48,7 +42,7 @@
       const tableBody = document.getElementById('tableBody');
       tableBody.innerHTML = ''; // Clear table body
       Tabletop.init({
-        key: 'YOUR_SPREADSHEET_ID',
+        key: '1Jc9TsdJwvmCdaRSIeasMOtDD_OLBs2keyMgUcsm7F8g',
         callback: data => {
           data.forEach(row => {
             if (row.date.includes(dateFilter) && row.amount.includes(amountFilter) && row.description.includes(descriptionFilter)) {
