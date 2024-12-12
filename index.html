@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Data Table</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Tabletop.js/1.5.1/tabletop.min.js"></script>
 </head>
 <body>
   <input type="text" id="dateFilter" placeholder="Filter by Date">
@@ -22,11 +23,24 @@
       <!-- Data will be inserted here -->
     </tbody>
   </table>
-  <script src="script.js"></script>
   <script>
-    async function fetchData() {
-      // Fetch data logic here
+    function fetchData() {
+      Tabletop.init({
+        key: '1Jc9TsdJwvmCdaRSIeasMOtDD_OLBs2keyMgUcsm7F8g',
+        callback: showInfo,
+        simpleSheet: true
+      });
     }
+
+    function showInfo(data) {
+      const tableBody = document.getElementById('tableBody');
+      data.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${row.date}</td><td>${row.amount}</td><td>${row.description}</td>`;
+        tableBody.appendChild(tr);
+      });
+    }
+
     function filterData() {
       const dateFilter = document.getElementById('dateFilter').value;
       const amountFilter = document.getElementById('amountFilter').value;
@@ -43,6 +57,8 @@
         });
       });
     }
+
+    fetchData();
   </script>
 </body>
 </html>
