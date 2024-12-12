@@ -1,70 +1,134 @@
 <!DOCTYPE html>
-<html>
-
-        <style>
-        /* Basic Styles */
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Sheets Data Fetch</title>
+    <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
-            padding: 20px;
-            background-color: #f4f4f9;
-            color: #333;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f5f5f5;
         }
-
-        h1 {
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 1rem;
+            width: 100%;
             text-align: center;
-            color: #444;
-            margin-bottom: 20px;
         }
-
-        /* Table Styles */
-        table {
-            width: 80%;
-            margin: 0 auto;
+        .filter-container {
+            margin: 20px 0;
+        }
+        .data-table {
             border-collapse: collapse;
+            width: 80%;
+            margin: 20px 0;
             background-color: white;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-
-        th, td {
-            padding: 12px 15px;
+        .data-table th, .data-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        .data-table th {
+            background-color: #f2f2f2;
             text-align: left;
         }
-
-        th {
-            background-color: #0077cc;
-            color: white;
-            text-transform: uppercase;
-        }
-
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-
-        tr:hover {
-            background-color: #f1f1f1;
-        }
-
-        td {
-            border-bottom: 1px solid #ddd;
-        }
-
-        /* Centered Footer */
-        footer {
-            text-align: center;
-            margin-top: 20px;
-            color: #666;
-        }
     </style>
+</head>
 <body>
-    <h1>Google Sheets Dashboard</h1>
-    <table id="dashboard" class="display" style="width:100%">
+    <header>
+        <h1>Google Sheets Data Viewer</h1>
+    </header>
+    <div class="filter-container">
+        <label for="filter">Filter by keyword:</label>
+        <input type="text" id="filter" oninput="applyFilter()" placeholder="Enter keyword">
+    </div>
+    <table class="data-table" id="data-table">
         <thead>
-            <tr>
+            <tr id="table-header">
+                <!-- Table headers will be inserted dynamically -->
             </tr>
         </thead>
-        <tbody></tbody>
+        <tbody id="table-body">
+            <!-- Table data will be inserted dynamically -->
+        </tbody>
     </table>
-    <script src="script.js"></script>
+
+    <script>
+        // Replace with your Google Sheets API URL (published as a web app or JSON feed)
+        const SHEET_URL = "https://spreadsheets.google.com/feeds/cells/1-P9fAKkmqFPuKxamR2nf-FpsMkd63SFcvIouIJWuuyU/1/public/full?alt=json";
+
+        // Fetch data from the Google Sheet
+        async function fetchSheetData() {
+            try {
+                const response = await fetch(SHEET_URL);
+                const data = await response.json();
+                const entries = data.feed.entry;
+
+                // Extract rows and columns
+                const rows = [];
+                let maxCol = 0;
+                entries.forEach(entry => {
+                    const row = parseInt(entry.gs$cell.row, 10);
+                    const col = parseInt(entry.gs$cell.col, 10);
+                    maxCol = Math.max(maxCol, col);
+                    rows[row] = rows[row] || [];
+                    rows[row][col - 1] = entry.gs$cell.$t;
+                });
+
+                renderTable(rows);
+            } catch (error) {
+                console.error("Error fetching sheet data:", error);
+            }
+        }
+
+        // Render the table
+        function renderTable(rows) {
+            const headerRow = rows[0];
+            const tableHeader = document.getElementById("table-header");
+            const tableBody = document.getElementById("table-body");
+
+            tableHeader.innerHTML = "";
+            tableBody.innerHTML = "";
+
+            // Populate headers
+            headerRow.forEach(header => {
+                const th = document.createElement("th");
+                th.textContent = header;
+                tableHeader.appendChild(th);
+            });
+
+            // Populate rows
+            rows.slice(1).forEach(row => {
+                const tr = document.createElement("tr");
+                row.forEach(cell => {
+                    const td = document.createElement("td");
+                    td.textContent = cell || "";
+                    tr.appendChild(td);
+                });
+                tableBody.appendChild(tr);
+            });
+        }
+
+        // Apply filter to table
+        function applyFilter() {
+            const keyword = document.getElementById("filter").value.toLowerCase();
+            const rows = document.querySelectorAll("#table-body tr");
+
+            rows.forEach(row => {
+                const cells = row.querySelectorAll("td");
+                const match = Array.from(cells).some(cell => cell.textContent.toLowerCase().includes(keyword));
+                row.style.display = match ? "" : "none";
+            });
+        }
+
+        // Initialize
+        fetchSheetData();
+    </script>
 </body>
 </html>
